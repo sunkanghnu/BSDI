@@ -1,0 +1,52 @@
+# Configuration for the re-selection differential diagnostic (D = Q(S1) - Q(S2)).
+# All paths are relative to the repo root (see src/paths.py).
+
+project:
+  seed: 42
+  parallel_jobs: 2        # -1 = all CPUs; or set e.g. 4
+  backend: threading       # threading (shared memory, recommended) | loky (processes)
+  force_recompute: false   # true = recompute and overwrite selection caches (S1/S2)
+  force_ranking: false     # true = recompute and overwrite full-ranking caches
+  force_stats: false       # true = recompute and overwrite shared statistics
+
+classifier:
+  name: knn                # fixed kNN
+  n_neighbors: 5
+  metric: euclidean
+  test_size: 0.8           # 80% test / 20% train, stratified by class
+  random_state: 42
+
+datasets:
+  - name: indian_pines
+    tag: IP
+  - name: paviau
+    tag: PU
+  - name: salinas
+    tag: SL
+
+# Methods to run (names must match REGISTRY in src/algorithms/__init__.py).
+methods:
+  # supervised (6): mRMR / LDA / LASSO / LR / MI / NHMC
+  - MI
+  - mRMR
+  - LDA
+  - LASSO
+  - LR
+  - NHMC
+  # unsupervised (6): MVPCA / MCD / DPC / HOGSP / CAE / ETP
+  - ETP
+  - MVPCA
+  - MCD
+  - DPC
+  - HOGSP
+  - CAE
+
+# k values (2k <= L guarantees a re-selection is always possible; L=103 -> k<=51)
+ks: [5, 10, 15, 20, 25, 30]
+
+random_baseline:
+  n_groups: 100            # number of random subsets B (reference only)
+  seed: 42
+
+stats:
+  max_pixels: null         # if set, subsample pixels before computing pixel-level statistics
